@@ -37,7 +37,7 @@ func buildTenant(data *schema.ResourceData) (fusionauth.Tenant, diag.Diagnostics
 			VerificationEmailTemplateId:          data.Get("email_configuration.0.verification_email_template_id").(string),
 			VerifyEmail:                          data.Get("email_configuration.0.verify_email").(bool),
 			VerifyEmailWhenChanged:               data.Get("email_configuration.0.verify_email_when_changed").(bool),
-			VerificationStrategy:                 data.Get("email_configuration.0.verification_strategy").(string),
+			VerificationStrategy:                 fusionauth.VerificationStrategy(data.Get("email_configuration.0.verification_strategy").(string)),
 			DefaultFromEmail:                     data.Get("email_configuration.0.default_from_email").(string),
 			DefaultFromName:                      data.Get("email_configuration.0.default_from_name").(string),
 			Unverified: fusionauth.EmailUnverifiedOptions{
