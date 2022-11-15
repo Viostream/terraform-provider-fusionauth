@@ -6,6 +6,7 @@ import (
 	"github.com/FusionAuth/go-client/pkg/fusionauth"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func buildTenant(data *schema.ResourceData) (fusionauth.Tenant, diag.Diagnostics) {
@@ -36,6 +37,7 @@ func buildTenant(data *schema.ResourceData) (fusionauth.Tenant, diag.Diagnostics
 			VerificationEmailTemplateId:          data.Get("email_configuration.0.verification_email_template_id").(string),
 			VerifyEmail:                          data.Get("email_configuration.0.verify_email").(bool),
 			VerifyEmailWhenChanged:               data.Get("email_configuration.0.verify_email_when_changed").(bool),
+			VerificationStrategy:                 data.Get("email_configuration.0.verification_strategy").(string),
 			DefaultFromEmail:                     data.Get("email_configuration.0.default_from_email").(string),
 			DefaultFromName:                      data.Get("email_configuration.0.default_from_name").(string),
 			Unverified: fusionauth.EmailUnverifiedOptions{
@@ -365,6 +367,7 @@ func buildResourceDataFromTenant(t fusionauth.Tenant, data *schema.ResourceData)
 			"two_factor_method_remove_email_template_id":  t.EmailConfiguration.TwoFactorMethodRemoveEmailTemplateId,
 			"username":                       t.EmailConfiguration.Username,
 			"verification_email_template_id": t.EmailConfiguration.VerificationEmailTemplateId,
+			"verification_strategy":          t.EmailConfiguration.VerificationStrategy,
 			"verify_email":                   t.EmailConfiguration.VerifyEmail,
 			"verify_email_when_changed":      t.EmailConfiguration.VerifyEmailWhenChanged,
 			"default_from_email":             t.EmailConfiguration.DefaultFromEmail,
@@ -646,3 +649,58 @@ func buildResourceDataFromTenant(t fusionauth.Tenant, data *schema.ResourceData)
 
 	return nil
 }
+
+var validateTenantEventConfiguration = validation.StringInSlice([]string{
+	"audit-log.create",
+	"event-log.create",
+	"group.create",
+	"group.create.complete",
+	"group.delete",
+	"group.delete.complete",
+	"group.member.add",
+	"group.member.add.complete",
+	"group.member.remove",
+	"group.member.remove.complete",
+	"group.member.update",
+	"group.member.update.complete",
+	"group.update",
+	"group.update.complete",
+	"jwt.public-key.update",
+	"jwt.refresh",
+	"jwt.refresh-token.revoke",
+	"kickstart.success",
+	"user.action",
+	"user.bulk.create",
+	"user.create",
+	"user.create.complete",
+	"user.deactivate",
+	"user.delete",
+	"user.delete.complete",
+	"user.email.update",
+	"user.email.verified",
+	"user.identity-provider.link",
+	"user.identity-provider.unlink",
+	"user.loginId.duplicate.create",
+	"user.loginId.duplicate.update",
+	"user.login.failed",
+	"user.login.new-device",
+	"user.login.success",
+	"user.login.suspicious",
+	"user.password.breach",
+	"user.password.reset.send",
+	"user.password.reset.start",
+	"user.password.reset.success",
+	"user.password.update",
+	"user.reactivate",
+	"user.registration.create",
+	"user.registration.create.complete",
+	"user.registration.delete",
+	"user.registration.delete.complete",
+	"user.registration.update",
+	"user.registration.update.complete",
+	"user.registration.verified",
+	"user.two-factor.method.add",
+	"user.two-factor.method.remove",
+	"user.update",
+	"user.update.complete",
+}, false)
