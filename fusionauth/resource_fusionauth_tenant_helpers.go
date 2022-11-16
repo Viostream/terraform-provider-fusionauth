@@ -704,3 +704,5 @@ var validateTenantEventConfiguration = validation.StringInSlice([]string{
 	"user.update",
 	"user.update.complete",
 }, false)
+
+var validateVerificationStrategy = validation.StringInSlice([]string{"ClickableLink", "FormField"}, false)

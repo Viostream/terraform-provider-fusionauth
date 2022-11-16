@@ -269,7 +269,7 @@ func newApplication() *schema.Resource {
 				Optional:     true,
 				Default:      "ClickableLink",
 				Description:  "The process by which the user will verify their email address.",
-				ValidateFunc: validation.StringInSlice([]string{"ClickableLink", "FormField"}, false),
+				ValidateFunc: validateVerificationStrategy,
 			},
 			"verify_registration": {
 				Type:        schema.TypeBool,
