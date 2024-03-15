@@ -2,9 +2,11 @@ package fusionauth
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/FusionAuth/go-client/pkg/fusionauth"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -66,15 +68,21 @@ func updateTenant(ctx context.Context, data *schema.ResourceData, i interface{})
 		return diags
 	}
 
-	t := fusionauth.TenantRequest{
-		Tenant:         tenant,
-		SourceTenantId: data.Get("source_tenant_id").(string),
+	t := map[string]interface{}{
+		"Tenant":         tenant,
+		"SourceTenantId": data.Get("source_tenant_id").(string),
 	}
 
-	resp, faErrs, err := client.FAClient.UpdateTenant(data.Id(), t)
+	tflog.Info(ctx, "Patching tenant with")
+
+	// PatchTenant is used instead of UpdateTenant because we manage webhooks via the
+	// webhook resource, and using the UpdateTenant method here deletes any webhooks
+	// See https://github.com/gpsinsight/terraform-provider-fusionauth/issues/164
+	resp, faErrs, err := client.FAClient.PatchTenant(data.Id(), t)
 	if err != nil {
-		return diag.Errorf("UpdateTenant err: %v", err)
+		return diag.Errorf("PatchTenant err: %v", err)
 	}
+	tflog.Info(ctx, fmt.Sprintf("Response: %+v", resp))
 	if err := checkResponse(resp.StatusCode, faErrs); err != nil {
 		return diag.FromErr(err)
 	}
